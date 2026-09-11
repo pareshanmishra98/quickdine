@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { AuthRequest } from "../middlewares/auth.js";
 import { Restaurant } from "../models/Restaurant.js";
-import { v2 as cloudinary } from 'cloudinary'
+import cloudinary from "../config/cloudinary.js";
 import { Booking } from "../models/Booking.js";
 
 //helper function to upload buffer to cloudinary
@@ -28,6 +28,7 @@ export const getOwnerRestaurant = async (req: AuthRequest, res: Response): Promi
             res.status(200).json(null);
             return;
         }
+        res.status(200).json(restaurant);
     }
     catch (error: any) {
         console.error(error);
@@ -45,7 +46,7 @@ export const createOwnerRestaurant = async (req: AuthRequest, res: Response): Pr
             return;
         }
         const { name, description, cuisine, priceRange, location, address, chef, tags, availableSlots, totalSeats } = req.body;
-        if (!name || !description || !cuisine || !priceRange || location || !address || !chef) {
+        if (!name || !description || !cuisine || !priceRange || !location || !address || !chef) {
             res.status(400).json({ message: "Please provide all required fields" })
             return;
         }

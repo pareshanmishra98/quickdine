@@ -13,53 +13,62 @@ const generateToken = (id: string) => {
 // register a new user
 // POST /api/auth/register
 
-export const registerUser = async (req: Request, res: Response): Promise<void> => {
+export const registerUser = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+
+
 
     try {
         const { name, email, password, phone, role } = req.body;
-        if (!name || email || !password) {
-            res.status(400).json({ message: "Please enter all required fields" })
+
+        if (!name || !email || !password) {
+            console.log("❌ VALIDATION FAILED");
+
+            res.status(400).json({
+                message: "Please enter all required fields"
+            });
             return;
         }
 
-        //check if user exists
-        const userExists = await User.findOne({ email })
+        const userExists = await User.findOne({ email });
+
         if (userExists) {
-            res.status(400).json({ message: "User already exists" })
+            res.status(400).json({
+                message: "User already exists"
+            });
             return;
         }
-        // if user doesn't exist we hash the password
-        const salt = await bcrypt.genSalt(10)
-        const hashedPassword = await bcrypt.hash(password, salt)
 
-        // create user
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
         const user = await User.create({
             name,
             email,
             password: hashedPassword,
             phone,
             role,
-        })
-        if (user) {
-            res.status(201).json({
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                phone: user.phone,
-                role: user.role,
-                token: generateToken(user._id.toString())
-            })
-        }
-        else {
-            res.status(400).json({ message: "Invalid user data" })
-        }
+        });
 
+        res.status(201).json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            phone: user.phone,
+            role: user.role,
+            token: generateToken(user._id.toString())
+        });
 
     } catch (error: any) {
-        console.error(error);
-        res.status(400).json({ message: error.message });
+        console.error("REGISTER ERROR:", error);
+
+        res.status(400).json({
+            message: error.message
+        });
     }
-}
+};
 
 // authenticate a user and get token
 // POST /api/auth/login
