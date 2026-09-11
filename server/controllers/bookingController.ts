@@ -75,7 +75,7 @@ export const createBooking = async (req: AuthRequest, res: Response): Promise<vo
 export const getMyBookings = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
 
-        const bookings = await Booking.find({ user: req.user?._id }).populate("restaurent", "name location image address slug").sort({ date: -1, time: -1 })
+        const bookings = await Booking.find({ user: req.user?._id }).populate("restaurant", "name location image address slug").sort({ date: -1, time: -1 })
         res.json(bookings);
     }
     catch (error: any) {
